@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    depends_on:
+      - db
+    env_file:
+      - ./src/.env
+    networks:
+      - default
+    ports:
+      - 5000:5000
+      - 5002:5000
+    volumes:
+      - ./src:/src
+  db:
+    image: postgres:latest
+    env_file:
+      - ./src/.env
+    networks:
+      - default
+    ports:
+      - 5432:5432
+    restart: always
+    volumes:
+      - ./data:/var/lib/postgresql/data

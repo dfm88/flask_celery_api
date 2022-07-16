@@ -7,8 +7,8 @@ from flask_migrate import Migrate
 from flask_migrate import upgrade
 
 
-
 db = SQLAlchemy()
+
 
 def create_app(config_class=Config) -> Flask:
     """

@@ -1,6 +1,7 @@
 
 import os
 
+
 class Config:
     # Secret key for cross site validation
     # randomly generated with python module secrets.token_hex(16)

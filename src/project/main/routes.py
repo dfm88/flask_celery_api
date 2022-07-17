@@ -1,6 +1,5 @@
 
 import json
-import re
 
 from celery.result import AsyncResult
 from flask import Blueprint, jsonify
@@ -9,6 +8,7 @@ from flask import request
 from project.main.tasks import func1
 from project.main.models import Address, Info, Restaurant
 from project import db
+from project.main.utils import validate_data_to_model
 
 
 main_blueprint = Blueprint(
@@ -26,26 +26,7 @@ def hello_world():
 @main_blueprint.route('/add', methods=['POST'])
 def add():
     data = request.get_json()
-    for el in data:
-        name = el['name']
-        type_ = el['type']
-
-        address = el['address']
-        address = re.split(r',|-', address)
-        street = address[0].strip()
-        st_number = address[1].strip()
-        city = address[2].strip()
-
-        info = el['info']
-
-        address = Address(street=street, city=city, st_number=st_number)
-        info = Info(**info)
-        restaurant = Restaurant(name=name, type=type_)
-        restaurant.address = address
-        restaurant.info = info
-
-        db.session.add(restaurant)
-        db.session.commit()
+    validate_data_to_model(data_list=data)
 
     return json.dumps("Added"), 200
 

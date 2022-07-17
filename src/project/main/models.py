@@ -1,7 +1,7 @@
-from flask import current_app
-from sqlalchemy.orm import backref
-from sqlalchemy import UniqueConstraint
+import re
+
 from project import db
+from project.main.exceptions import InvalidAddressException
 
 
 class Address(db.Model):
@@ -13,6 +13,21 @@ class Address(db.Model):
         "restaurant.id", ondelete='CASCADE'), unique=True, nullable=False)
     restaurant    = db.relationship(
         "Restaurant", back_populates="address", uselist=False)
+
+    def __init__(self, address: str, *args, **kwargs):
+        """
+        address string should have format: 'street, street_number - city' 
+        """
+        try:
+            address = re.split(r',|-', address)
+            self.street = address[0].strip()
+            self.st_number = address[1].strip()
+            self.city = address[2].strip()
+            super().__init__(*args, **kwargs)
+
+        except InvalidAddressException as ex:
+            raise ex
+
 
     def __repr__(self):
         return f"{self.street}, {self.st_number} - {self.city}"

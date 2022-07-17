@@ -1,7 +1,7 @@
 from flask import current_app
 from sqlalchemy.orm import backref
 from sqlalchemy import UniqueConstraint
-from app import db
+from project import db
 
 
 class Address(db.Model):

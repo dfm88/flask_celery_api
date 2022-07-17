@@ -1,11 +1,14 @@
 
-from flask import Blueprint
-from flask import request
-
-from app.models import Address, Info, Restaurant
-from app import db
 import json
 import re
+
+from celery.result import AsyncResult
+from flask import Blueprint, jsonify
+from flask import request
+
+from project.main.tasks import func1
+from project.main.models import Address, Info, Restaurant
+from project import db
 
 
 main = Blueprint('main', __name__)
@@ -20,8 +23,6 @@ def hello_world():
 
 @main.route('/add', methods=['POST'])
 def add():
-    import ipdb
-    ipdb.set_trace()
     data = request.get_json()
     for el in data:
         name = el['name']
@@ -54,3 +55,26 @@ def delete_restaurant(post_id):
     db.session.delete(res)
     db.session.commit()
     return 'ok', 200
+
+
+@main.route('/send', methods=['GET'])
+def celery_func():
+    task = func1.delay('ciao')
+    return {
+        'id': task.id
+    }
+
+@main.route('/read/<task_id>')
+def taskstatus(task_id):
+    task = AsyncResult(task_id)
+    if task.state == 'PENDING':
+        response = {
+            'queue_state': task.state,
+            'status': 'Process is ongoing...w',
+        }
+    else:
+        response = {
+            'queue_state': task.state,
+            'result': task.wait()
+        }
+    return jsonify(response)

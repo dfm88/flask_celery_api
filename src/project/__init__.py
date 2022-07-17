@@ -3,7 +3,12 @@ import os
 from dotenv import load_dotenv
 
 from flask import Flask
+
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
+
 from flask_celeryext import FlaskCeleryExt
+
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
@@ -36,6 +41,13 @@ def create_app(config_name=None) -> Flask:
     # blueprint init
     from project.main.routes import main_blueprint
     app.register_blueprint(main_blueprint)
+
+    # admin
+    from project.main.models import Restaurant, Address, Info, ChildView
+    admin = Admin(app)
+    admin.add_view(ChildView(Restaurant, db.session))
+    admin.add_view(ModelView(Address, db.session))
+    admin.add_view(ModelView(Info, db.session))
 
     # shell context for flask cli
     @app.shell_context_processor

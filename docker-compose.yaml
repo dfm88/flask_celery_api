@@ -3,6 +3,7 @@ version: '3.8'
 services:
 ## BACKEND
   api:
+    container_name: flask_rest_api
     build: .
     depends_on:
       - db

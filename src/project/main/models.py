@@ -1,5 +1,7 @@
 import re
 
+from flask_admin.contrib.sqla import ModelView
+
 from project import db
 from project.main.exceptions import InvalidAddressException
 
@@ -61,3 +63,20 @@ class Restaurant(db.Model):
 
     def __repr__(self):
         return f"Restaurant '{self.name}' - {self.type} - {self.address}"
+
+
+
+class ChildView(ModelView):
+    """
+    Shows ref field of Restaurant in admin panel
+    """
+    column_display_pk = True
+    column_hide_backrefs = False
+    column_list = (
+        'id', 
+        'name',
+        'type',
+        'address',
+        'info',
+    )
+

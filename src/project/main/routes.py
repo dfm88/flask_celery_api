@@ -1,14 +1,11 @@
 
-import json
-
 from celery.result import AsyncResult
-from flask import Blueprint, jsonify
-from flask import request
 
-from project.main.tasks import func1
-from project.main.models import Address, Info, Restaurant
+from flask import Blueprint, jsonify, request
+
+from project.main.models import Restaurant
 from project import db
-from project.main.utils import validate_data_to_model
+from project.main.tasks import validate_data_to_model
 
 
 main_blueprint = Blueprint(
@@ -26,39 +23,40 @@ def hello_world():
 @main_blueprint.route('/add', methods=['POST'])
 def add():
     data = request.get_json()
-    validate_data_to_model(data_list=data)
+    job = validate_data_to_model.apply_async(
+        kwargs={
+            'data_list':data
+        }
+    )
+    res = {
+        'id': job.id
+    }
+    
+    return jsonify(res)
 
-    return json.dumps("Added"), 200
 
-
-@main_blueprint.route("/del/<int:rest_id>", methods=['POST'])
-def delete_restaurant(post_id):
-    res = Restaurant.query.get_or_404(post_id)
+@main_blueprint.route("/del/<int:rest_id>", methods=['DELETE'])
+def delete_restaurant(rest_id):
+    res = Restaurant.query.get_or_404(rest_id)
 
     db.session.delete(res)
     db.session.commit()
-    return 'ok', 200
+    db.session.close()
+    return 'ok', 204
 
 
-@main_blueprint.route('/send', methods=['GET'])
-def celery_func():
-    task = func1.delay('ciao')
-    return {
-        'id': task.id
-    }
-
-@main_blueprint.route('/read/<task_id>')
+##########################
+@main_blueprint.route('/task_status/<task_id>')
 def taskstatus(task_id):
     task = AsyncResult(task_id)
-    if task.state == 'PENDING':
-        response = {
-            'queue_state': task.state,
-            'queue_results': task.result,
-            'status': 'Process is ongoing...',
-        }
+    if isinstance(task.result, Exception):
+        task_result = str(task.result)
     else:
-        response = {
-            'queue_state': task.state,
-            'result': task.wait()
-        }
+        task_result = task.result
+
+    response = {
+        'state': task.state,
+        'result': task_result,
+    }
+
     return jsonify(response)

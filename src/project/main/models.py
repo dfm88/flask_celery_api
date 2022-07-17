@@ -35,7 +35,7 @@ class Address(db.Model):
 
 class Info(db.Model):
     id                       = db.Column(db.Integer, primary_key=True)
-    tipo_piatto_principale   = db.Column(db.String(128), nullable=True)
+    tipo_piatto_principale   = db.Column(db.String(256), nullable=True)
     prezzo_piatto_principale = db.Column(db.Float(precision=2), nullable=True)
     voto_piatto_principale   = db.Column(db.Float(precision=2), nullable=True)
     voto_medio               = db.Column(db.Float(precision=2), nullable=True)
@@ -52,13 +52,12 @@ class Restaurant(db.Model):
         db.UniqueConstraint('name', 'type', name='unique_rest_constraint'),
     )
     id      = db.Column(db.Integer, primary_key=True)
-    name    = db.Column(db.String(56), nullable=False)
-    type    = db.Column(db.String(56), nullable=False)
-    # address_id = db.Column(db.Integer, db.ForeignKey('address.id'), unique=True)
+    name    = db.Column(db.String(256), nullable=False)
+    type    = db.Column(db.String(256), nullable=False)
     address = db.relationship(
-        "Address", back_populates="restaurant", uselist=False)
-    # info_id    = db.Column(db.Integer, db.ForeignKey('info.id'), unique=True)
-    info    = db.relationship("Info", back_populates="restaurant", uselist=False)
+        "Address", back_populates="restaurant", uselist=False, cascade="all, delete-orphan")
+    info    = db.relationship(
+        "Info", back_populates="restaurant", uselist=False,cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"Restaurant '{self.name}' - {self.type} - {self.address}"

@@ -6,23 +6,9 @@ from project.main.exceptions import RestaurantAlreadyExists
 from project.main.models import Address, Info, Restaurant
 
 
-def validate_data_to_model(data_list: list):
-    session = db.session
-    data_length = len(data_list)
-    with session.begin():
-        for i, el in enumerate(data_list):
-            try:
-                print(f'Parsing {i+1}/{data_length}')
-                _validate_data(data=el, session=session)
-            except RestaurantAlreadyExists as rex:
-                print(rex)
-                continue
-            except Exception as ex:
-                print(f'Error saving data {el}: \n{ex}')
-                raise ex
 
 
-def _validate_data(data: dict, session) -> Tuple[Restaurant, Address, Info]:
+def validate_data(data: dict, session) -> Tuple[Restaurant, Address, Info]:
     # RESTAURANT
     restaurant = _save_restaurant(
         data=data,

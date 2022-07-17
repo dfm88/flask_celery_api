@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.7'
 
 services:
 ## BACKEND
@@ -57,6 +57,8 @@ services:
       context: .
     entrypoint: celery
     command: -A run.celery flower -l info -p 5555
+    volumes:
+      - ./src:/src
     ports:
       - 5555:5555
     env_file:

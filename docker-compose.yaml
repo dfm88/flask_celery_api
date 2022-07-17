@@ -52,7 +52,6 @@ services:
 ## FLOWER
   flower:
     image: mher/flower:1.0.0
-    restart: always
     build:
       context: .
     entrypoint: celery

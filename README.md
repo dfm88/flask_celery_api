@@ -88,7 +88,7 @@ ___________
 E' stata usata la libreria Flask-Admin per fornire una veloce visualizzazione deidati salvati a DB, raggiungibile al seguente endpoint
 
 ```
-POST http://localhost:5000/admin
+GET http://localhost:5000/admin
 ```
 
 ## TEST VELOCE DELL'APPLICAZIONE
@@ -106,6 +106,6 @@ sh result_by_job_id <task_id>
 ___________
 Per visualizzare i risultati
 ```
-POST http://localhost:5000/admin
+GET http://localhost:5000/admin
 ```
 

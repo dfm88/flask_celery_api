@@ -82,6 +82,14 @@ ___________
 ```
 DELETE http://localhost:5000/del/<id>
 ```
+___________
+* Endpoint di visualizzazione dei dati
+
+E' stata usata la libreria Flask-Admin per fornire una veloce visualizzazione deidati salvati a DB, raggiungibile al seguente endpoint
+
+```
+POST http://localhost:5000/admin
+```
 
 ## TEST VELOCE DELL'APPLICAZIONE
 E' possibile testare l'applicazione da riga di comando avviando, dalla root del progetto, i seguenti comandi
@@ -95,5 +103,9 @@ Con questo comando invece, passando come argomento il `<task_id>` restituito dal
 ```sh
 sh result_by_job_id <task_id>
 ```
-
+___________
+Per visualizzare i risultati
+```
+POST http://localhost:5000/admin
+```
 

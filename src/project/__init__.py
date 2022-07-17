@@ -34,7 +34,7 @@ def create_app(config_name=None) -> Flask:
     # migrate.init_app(app, db)
 
     # blueprint init
-    from project.main import main_blueprint
+    from project.main.routes import main_blueprint
     app.register_blueprint(main_blueprint)
 
     # shell context for flask cli

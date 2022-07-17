@@ -1,12 +1,16 @@
 version: '3.8'
 
 services:
+## BACKEND
   api:
     build: .
     depends_on:
       - db
+      - redis
     env_file:
       - ./src/.env
+    environment:
+      - SERVICE=api
     networks:
       - default
     ports:
@@ -14,6 +18,56 @@ services:
       - 5002:5000
     volumes:
       - ./src:/src
+
+## REDIS
+  redis:
+    image: redis:alpine
+    container_name: redis
+    hostname: redis
+    ports:
+      - "6379:6379"
+
+## CELERY WORKER
+  worker:
+    restart: always
+    build:
+      context: .
+    hostname: worker
+    entrypoint: celery
+    command: -A run.celery worker -l info
+    volumes:
+      - ./src:/src
+    links:
+      - redis
+    env_file:
+      - ./src/.env
+    environment:
+      - SERVICE=celery
+    depends_on:
+      - redis
+      - db
+      - api
+
+## FLOWER
+  flower:
+    image: mher/flower:1.0.0
+    restart: always
+    build:
+      context: .
+    entrypoint: celery
+    command: -A run.celery flower -l info -p 5555
+    ports:
+      - 5555:5555
+    env_file:
+      - ./src/.env
+    environment:
+      - SERVICE=flower
+    depends_on:
+      - worker
+      - redis
+      - api
+
+## DB
   db:
     image: postgres:latest
     env_file:

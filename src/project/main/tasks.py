@@ -1,5 +1,6 @@
 from time import sleep
-from celery import shared_task, current_task
+from celery import shared_task, current_task, states
+
 
 @shared_task
 def func1(arg):
@@ -11,9 +12,9 @@ def func1(arg):
     }
 
     for i in range(20):
-        meta['step'] = 1
+        meta['step'] = i
         current_task.update_state(
-            state='PENDING',
+            state=states.PENDING,
             meta=meta
         )
         sleep(1)
